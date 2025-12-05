@@ -1,28 +1,415 @@
----
-title: Farcaster Mini Apps
-description: Learn to build and distribute apps to Farcaster users
----
- 
-# Why Mini Apps?
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTFACESLAYA | Phantom DApp</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for a dark, ethereal/ghostly theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05020a; /* Ultra dark background */
+            /* Ethereal, misty background effect */
+            background-image: radial-gradient(circle at 50% 10%, #1a0033 0%, #05020a 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .neon-text {
+            font-family: 'Chakra Petch', sans-serif;
+            /* Deeper purple/cyan glow */
+            text-shadow: 0 0 8px #9300ff, 0 0 15px #9300ff, 0 0 30px #00ffff, 0 0 60px #00ffff;
+            color: #ffffff;
+        }
+        .neon-button {
+            border: 2px solid #00ffff;
+            background-color: #0d001a;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth, ghostly transition */
+            box-shadow: 0 0 15px #00ffff;
+        }
+        .neon-button:hover {
+            background-color: #00ffff;
+            color: #0d001a;
+            box-shadow: 0 0 25px #ff00ff, 0 0 40px #00ffff;
+            transform: translateY(-3px) scale(1.02);
+        }
+        .stat-card {
+            border: 1px solid rgba(147, 0, 255, 0.5); /* Purple border */
+            background-color: rgba(13, 0, 26, 0.6); /* Slightly transparent dark purple */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(147, 0, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(147, 0, 255, 0.4);
+        }
 
-Mini Apps enable developers to distribute native-like apps to Farcaster users.
-Mini Apps are the easiest way to deliver engaging, high-retention, and easy to
-monetize applications:
+        /* Custom spinner for loading state */
+        .spinner {
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top: 4px solid #00ffff;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          animation: spin 1s linear infinite;
+          display: none;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
 
-- **Ship Fast** - Go from idea to users in hours—no app store reviews. Build
-with HTML, CSS, and JavaScript and use the Mini App SDK to deliver native-like
-apps.
-- **Get Discovered** - Social feed discovery puts users just 1-click away and
-viral growth mechanics are built in. Users can find new applications through
-Mini App stores.
-- **Retain Users** - Mobile notifications re-engage users by bringing them back
-when something new to do. Users can save their favorite Mini Apps so they are
-always a click away. 
-- **Transact Seamlessly** - An integrated Ethereum Wallet provides
-permissionless financial rails. Users can send money, buy art, or donate in a
-single click.
-- **Build Social** - Users are signed into Mini Apps without forms or
-passwords. Leverage Farcaster's rich social data to create engaging social
-experiences.
+        /* NFT Mint Button Style - Fuchia Glow */
+        .mint-button {
+            background-color: #9300ff; /* Deep Purple color */
+            color: #fff;
+            box-shadow: 0 0 15px #ff00ff;
+            transition: all 0.2s ease;
+        }
+        .mint-button:hover:not(:disabled) {
+            background-color: #ff00ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #ff00ff;
+        }
+        .mint-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
 
-![featured mini app](/why-miniapps.png)
+        /* Icon for Copy Button (SVG) */
+        .copy-icon {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-2xl bg-gray-950/80 p-6 sm:p-10 rounded-2xl shadow-2xl border border-purple-500/30">
+
+        <!-- Header and Connect Wallet -->
+        <header class="text-center mb-12">
+            <h1 class="neon-text text-5xl sm:text-7xl font-extrabold mb-2 uppercase tracking-widest">
+                GHOSTFACESLAYA
+            </h1>
+            <p class="text-gray-400 text-lg mb-6 italic">The Phantom Token. Haunting the Web3 Gaming Space.</p>
+
+            <!-- Official Contract Address Display -->
+            <div class="mb-8 p-3 bg-gray-950 rounded-xl border-2 border-cyan-400/40 shadow-xl shadow-cyan-900/50">
+                <p class="text-xs text-gray-400 mb-1 font-mono">OFFICIAL CONTRACT ADDRESS</p>
+                <div class="flex items-center justify-center">
+                    <code id="contract-address-code" class="text-sm sm:text-base text-cyan-300 font-mono break-all pr-2">
+                        0x93f31e00e6c8f91d46cfa3216e949259b079d959
+                    </code>
+                    <button onclick="copyContractAddress()" class="text-gray-400 hover:text-cyan-300 transition-colors ml-2 p-1 rounded">
+                        <!-- Copy SVG Icon -->
+                        <svg class="copy-icon" viewBox="0 0 24 24">
+                            <path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Wallet Connection Area (Interactive Simulation) -->
+            <div id="wallet-area">
+                <button id="connect-button" 
+                        onclick="connectWallet()"
+                        class="neon-button text-white font-bold py-3 px-8 rounded-full text-lg flex items-center justify-center mx-auto">
+                    Connect Wallet (Simulation)
+                    <div id="loading-spinner" class="spinner ml-3"></div>
+                </button>
+                
+                <!-- Wallet Info Display -->
+                <div id="address-display" class="hidden mt-6 p-4 bg-gray-800/70 rounded-lg text-white font-mono text-sm break-words border border-purple-400/50 shadow-md shadow-purple-900/50">
+                    <p class="text-gray-400 mb-1">Your Connected Wallet Address:</p>
+                    <div class="flex items-center justify-between">
+                        <code id="wallet-address-code" class="text-xs sm:text-sm text-cyan-300 truncate pr-2"></code>
+                        <button onclick="copyMyAddress()" class="text-gray-400 hover:text-cyan-300 transition-colors ml-2 p-1 rounded">
+                            <svg class="copy-icon" viewBox="0 0 24 24">
+                                <path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="mt-3 text-md text-purple-400">Balance: <span id="gfs-balance">0</span> $GFS</p>
+                    <p class="text-md text-purple-400">NFTs Held: <span id="nft-count">0</span> Slayer NFTs</p>
+                </div>
+
+                <!-- Copy Success Notification -->
+                <div id="copy-notification" class="hidden mt-2 text-xs text-green-400 bg-green-900/50 p-1 rounded-full w-48 mx-auto transition-opacity duration-300">
+                    Address Copied to Clipboard!
+                </div>
+
+                <p id="simulation-warning" class="mt-4 text-xs text-red-500 hidden">
+                    *Wallet connection is simulated for demonstration. The contract address above is live.*
+                </p>
+            </div>
+        </header>
+
+        <!-- Tokenomics Section - Marketing Focus -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-200 mb-6 border-b border-purple-500 pb-2">Tokenomics: Marketing Is The Slayer</h2>
+            <p class="text-gray-400 mb-6">
+                Our core focus is visibility. A significant portion of the total supply is dedicated exclusively to funding partnerships, exchange listings, and marketing campaigns targeting major anime franchises and web3 gaming platforms.
+            </p>
+            [attachment_0](attachment)
+            <div class="grid grid-cols-2 gap-4">
+                
+                <!-- Marketing Fund Card (HIGHLIGHT) -->
+                <div class="stat-card p-4 rounded-lg text-center col-span-2 sm:col-span-1 border-yellow-500/80 shadow-lg shadow-yellow-900/40">
+                    <p class="text-sm text-yellow-400 font-semibold uppercase">Community & Partnership Fund</p>
+                    <p class="text-3xl font-extrabold text-white" id="marketing-fund-supply">
+                        25% of Total Supply
+                    </p>
+                </div>
+
+                <!-- Liquidity Pool Card -->
+                <div class="stat-card p-4 rounded-lg text-center col-span-2 sm:col-span-1">
+                    <p class="text-sm text-gray-400">Initial Liquidity Pool</p>
+                    <p class="text-2xl sm:text-3xl font-extrabold text-green-400" id="liquidity-pool">
+                        50% Locked (Decentralized)
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- NFT Minting Section (Gateway to Utility) -->
+        <section class="mb-10 p-6 stat-card">
+            <h2 class="text-3xl font-bold text-gray-200 mb-4 border-b border-purple-500 pb-2 flex items-center">
+                Mint A Slayer NFT
+                <span class="text-sm text-gray-500 ml-4">(Max 5 per wallet)</span>
+            </h2>
+            
+            <div id="mint-area">
+                <p class="text-gray-400 mb-4">
+                    The *Slayer* NFT is your key to the ecosystem, granting voting power over marketing fund deployment and exclusive in-game assets.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <input type="number" id="mint-amount" value="1" min="1" max="5" 
+                           class="w-full sm:w-24 p-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-cyan-400 focus:ring-cyan-400 bg-transparent text-center"
+                           onchange="updateMintTotal()">
+                    
+                    <button id="mint-button" 
+                            onclick="mintNFT()"
+                            disabled
+                            class="mint-button text-white font-bold py-3 px-6 rounded-full text-lg w-full sm:w-auto">
+                        Mint 1 NFT (Total: 0.05 ETH)
+                    </button>
+                </div>
+                <p id="mint-status" class="mt-3 text-sm text-yellow-400"></p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- JavaScript Simulation Logic -->
+    <script>
+        // --- CONSTANTS ---
+        const CONTRACT_ADDRESS = "0x93f31e00e6c8f91d46cfa3216e949259b079d959";
+        // Using a mock address for the connected user's wallet
+        const MOCK_WALLET_ADDRESS = "0xPhantomDApp1234567890ConnectedWallet"; 
+        const MINT_PRICE = 0.05; // ETH per NFT
+        
+        // --- DOM Elements ---
+        const connectButton = document.getElementById('connect-button');
+        const addressDisplay = document.getElementById('address-display');
+        const simulationWarning = document.getElementById('simulation-warning');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const mintButton = document.getElementById('mint-button');
+        const mintAmountInput = document.getElementById('mint-amount');
+        const mintStatus = document.getElementById('mint-status');
+        const nftCountSpan = document.getElementById('nft-count');
+        const gfsBalanceSpan = document.getElementById('gfs-balance');
+        const copyNotification = document.getElementById('copy-notification');
+        const walletAddressCode = document.getElementById('wallet-address-code');
+        const contractAddressCode = document.getElementById('contract-address-code');
+
+        // --- State ---
+        let mockNftCount = 0;
+        let mockGfsBalance = 500000;
+        
+        // Initialize contract address text content
+        contractAddressCode.textContent = CONTRACT_ADDRESS;
+
+
+        /**
+         * Utility function to format numbers.
+         * @param {number} num 
+         * @returns {string}
+         */
+        const formatNumber = (num) => {
+            return num.toLocaleString('en-US');
+        }
+
+        /**
+         * Handles copying text to clipboard and showing a temporary notification.
+         * @param {string} textToCopy 
+         */
+        function copyToClipboard(textToCopy) {
+            // Use execCommand('copy') for better iframe compatibility
+            const el = document.createElement('textarea');
+            el.value = textToCopy;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            el.select();
+            try {
+                document.execCommand('copy');
+                copyNotification.classList.remove('hidden', 'opacity-0');
+                copyNotification.classList.add('opacity-100');
+                setTimeout(() => {
+                    copyNotification.classList.remove('opacity-100');
+                    copyNotification.classList.add('opacity-0');
+                    setTimeout(() => copyNotification.classList.add('hidden'), 500);
+                }, 1500);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(el);
+        }
+
+        /**
+         * Copies the mock wallet address to the clipboard.
+         */
+        function copyMyAddress() {
+            copyToClipboard(MOCK_WALLET_ADDRESS);
+            console.log("Mock Wallet Address Copied.");
+        }
+
+        /**
+         * Copies the official contract address to the clipboard.
+         */
+        function copyContractAddress() {
+            copyToClipboard(CONTRACT_ADDRESS);
+            console.log("Contract Address Copied.");
+        }
+
+
+        /**
+         * Simulates connecting to a Web3 wallet.
+         */
+        async function connectWallet() {
+            // Disable button and show loading spinner
+            connectButton.disabled = true;
+            connectButton.innerHTML = `Connecting...`;
+            loadingSpinner.style.display = 'block';
+
+            // Simulate network latency (2 seconds delay)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Successful connection simulation
+            try {
+                // 1. Update the UI to show the connected state
+                connectButton.classList.add('hidden');
+                
+                // Update address display with current mock data
+                walletAddressCode.textContent = MOCK_WALLET_ADDRESS;
+                gfsBalanceSpan.textContent = formatNumber(mockGfsBalance);
+                nftCountSpan.textContent = mockNftCount;
+
+                addressDisplay.classList.remove('hidden');
+                simulationWarning.classList.remove('hidden');
+                
+                // Enable Minting button
+                mintButton.disabled = false;
+                updateMintTotal();
+
+                // 2. Log success (for console review)
+                console.log("Wallet connected successfully (Simulation)");
+
+            } catch (error) {
+                console.error("Wallet connection failed (Simulation):", error);
+                connectButton.innerHTML = "Connection Failed. Try Again.";
+                connectButton.classList.remove('hidden'); // Show button again
+                connectButton.classList.add('bg-red-900', 'border-red-500');
+                
+            } finally {
+                loadingSpinner.style.display = 'none';
+                connectButton.disabled = false;
+            }
+        }
+        
+        /**
+         * Updates the text on the mint button based on the selected amount.
+         */
+        function updateMintTotal() {
+            const amount = parseInt(mintAmountInput.value, 10);
+            if (isNaN(amount) || amount < 1) {
+                mintAmountInput.value = 1;
+                updateMintTotal();
+                return;
+            }
+            // Max mint limit
+            if (amount > 5) {
+                mintAmountInput.value = 5;
+                updateMintTotal();
+                return;
+            }
+            
+            const totalEth = (amount * MINT_PRICE).toFixed(2);
+            mintButton.textContent = `Mint ${amount} NFT${amount > 1 ? 's' : ''} (Total: ${totalEth} ETH)`;
+            mintStatus.textContent = ''; // Clear status on change
+        }
+
+        /**
+         * Simulates the NFT minting transaction.
+         */
+        async function mintNFT() {
+            if (mintButton.disabled) return;
+            
+            const amount = parseInt(mintAmountInput.value, 10);
+
+            if (amount + mockNftCount > 5) {
+                mintStatus.textContent = `Mint limit exceeded. You can only mint ${5 - mockNftCount} more NFTs.`;
+                mintStatus.classList.remove('text-green-400', 'text-yellow-400');
+                mintStatus.classList.add('text-red-500');
+                return;
+            }
+            
+            // Disable button and show status
+            mintButton.disabled = true;
+            mintStatus.textContent = 'Transaction initiating... (Simulating gas fee)';
+            mintStatus.classList.remove('text-red-500');
+            mintStatus.classList.add('text-yellow-400');
+
+            // Simulate transaction delay
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // Successful mint simulation
+            mockNftCount += amount;
+            mockGfsBalance -= (amount * 1000); // Simulate token burn/fee
+            
+            // Update UI
+            nftCountSpan.textContent = mockNftCount;
+            gfsBalanceSpan.textContent = formatNumber(mockGfsBalance);
+            
+            mintStatus.textContent = `Success! Minted ${amount} Slayer NFT${amount > 1 ? 's' : ''}. Total held: ${mockNftCount}.`;
+            mintStatus.classList.remove('text-yellow-400');
+            mintStatus.classList.add('text-green-400');
+            
+            // Re-enable button
+            mintButton.disabled = false;
+            updateMintTotal();
+
+            console.log(`Successfully minted ${amount} NFTs. New NFT count: ${mockNftCount}`);
+        }
+        
+        // Expose functions globally
+        window.connectWallet = connectWallet;
+        window.mintNFT = mintNFT;
+        window.updateMintTotal = updateMintTotal;
+        window.copyMyAddress = copyMyAddress;
+        window.copyContractAddress = copyContractAddress;
+
+    </script>
+</body>
+</html>
+
