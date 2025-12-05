@@ -1,184 +1,414 @@
----
-title: Getting Started
-description: Get started building Mini Apps
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOSTFACESLAYA | Phantom DApp</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for a dark, ethereal/ghostly theme */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05020a; /* Ultra dark background */
+            /* Ethereal, misty background effect */
+            background-image: radial-gradient(circle at 50% 10%, #1a0033 0%, #05020a 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .neon-text {
+            font-family: 'Chakra Petch', sans-serif;
+            /* Deeper purple/cyan glow */
+            text-shadow: 0 0 8px #9300ff, 0 0 15px #9300ff, 0 0 30px #00ffff, 0 0 60px #00ffff;
+            color: #ffffff;
+        }
+        .neon-button {
+            border: 2px solid #00ffff;
+            background-color: #0d001a;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth, ghostly transition */
+            box-shadow: 0 0 15px #00ffff;
+        }
+        .neon-button:hover {
+            background-color: #00ffff;
+            color: #0d001a;
+            box-shadow: 0 0 25px #ff00ff, 0 0 40px #00ffff;
+            transform: translateY(-3px) scale(1.02);
+        }
+        .stat-card {
+            border: 1px solid rgba(147, 0, 255, 0.5); /* Purple border */
+            background-color: rgba(13, 0, 26, 0.6); /* Slightly transparent dark purple */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(147, 0, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(147, 0, 255, 0.4);
+        }
 
-# Getting Started
+        /* Custom spinner for loading state */
+        .spinner {
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top: 4px solid #00ffff;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          animation: spin 1s linear infinite;
+          display: none;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
 
-import { Caption } from '../../components/Caption.tsx';
+        /* NFT Mint Button Style - Fuchia Glow */
+        .mint-button {
+            background-color: #9300ff; /* Deep Purple color */
+            color: #fff;
+            box-shadow: 0 0 15px #ff00ff;
+            transition: all 0.2s ease;
+        }
+        .mint-button:hover:not(:disabled) {
+            background-color: #ff00ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #ff00ff;
+        }
+        .mint-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
 
-## Overview
+        /* Icon for Copy Button (SVG) */
+        .copy-icon {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-Mini apps are web apps built with HTML, CSS, and Javascript that can be discovered
-and used within Farcaster clients. You can use an SDK to access native
-Farcaster features, like authentication, sending notifications, and interacting
-with the user's wallet. 
+    <!-- Main Container -->
+    <div class="w-full max-w-2xl bg-gray-950/80 p-6 sm:p-10 rounded-2xl shadow-2xl border border-purple-500/30">
 
-## Requirements
+        <!-- Header and Connect Wallet -->
+        <header class="text-center mb-12">
+            <h1 class="neon-text text-5xl sm:text-7xl font-extrabold mb-2 uppercase tracking-widest">
+                GHOSTFACESLAYA
+            </h1>
+            <p class="text-gray-400 text-lg mb-6 italic">The Phantom Token. Haunting the Web3 Gaming Space.</p>
 
-Before getting started, make sure you have:
+            <!-- Official Contract Address Display -->
+            <div class="mb-8 p-3 bg-gray-950 rounded-xl border-2 border-cyan-400/40 shadow-xl shadow-cyan-900/50">
+                <p class="text-xs text-gray-400 mb-1 font-mono">OFFICIAL CONTRACT ADDRESS</p>
+                <div class="flex items-center justify-center">
+                    <code id="contract-address-code" class="text-sm sm:text-base text-cyan-300 font-mono break-all pr-2">
+                        0x93f31e00e6c8f91d46cfa3216e949259b079d959
+                    </code>
+                    <button onclick="copyContractAddress()" class="text-gray-400 hover:text-cyan-300 transition-colors ml-2 p-1 rounded">
+                        <!-- Copy SVG Icon -->
+                        <svg class="copy-icon" viewBox="0 0 24 24">
+                            <path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-- **Node.js 22.11.0 or higher** (LTS version recommended)
-  - Check your version: `node --version`
-  - Download from [nodejs.org](https://nodejs.org/)
-- A package manager (npm, pnpm, or yarn)
+            <!-- Wallet Connection Area (Interactive Simulation) -->
+            <div id="wallet-area">
+                <button id="connect-button" 
+                        onclick="connectWallet()"
+                        class="neon-button text-white font-bold py-3 px-8 rounded-full text-lg flex items-center justify-center mx-auto">
+                    Connect Wallet (Simulation)
+                    <div id="loading-spinner" class="spinner ml-3"></div>
+                </button>
+                
+                <!-- Wallet Info Display -->
+                <div id="address-display" class="hidden mt-6 p-4 bg-gray-800/70 rounded-lg text-white font-mono text-sm break-words border border-purple-400/50 shadow-md shadow-purple-900/50">
+                    <p class="text-gray-400 mb-1">Your Connected Wallet Address:</p>
+                    <div class="flex items-center justify-between">
+                        <code id="wallet-address-code" class="text-xs sm:text-sm text-cyan-300 truncate pr-2"></code>
+                        <button onclick="copyMyAddress()" class="text-gray-400 hover:text-cyan-300 transition-colors ml-2 p-1 rounded">
+                            <svg class="copy-icon" viewBox="0 0 24 24">
+                                <path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="mt-3 text-md text-purple-400">Balance: <span id="gfs-balance">0</span> $GFS</p>
+                    <p class="text-md text-purple-400">NFTs Held: <span id="nft-count">0</span> Slayer NFTs</p>
+                </div>
 
-:::warning
-If you encounter installation errors, verify you're using Node.js 22.11.0 or higher. Earlier versions are not supported.
-:::
+                <!-- Copy Success Notification -->
+                <div id="copy-notification" class="hidden mt-2 text-xs text-green-400 bg-green-900/50 p-1 rounded-full w-48 mx-auto transition-opacity duration-300">
+                    Address Copied to Clipboard!
+                </div>
 
-## Enable Developer Mode
+                <p id="simulation-warning" class="mt-4 text-xs text-red-500 hidden">
+                    *Wallet connection is simulated for demonstration. The contract address above is live.*
+                </p>
+            </div>
+        </header>
 
-Developer mode gives you access to tools for Mini Apps, here's how to enable it:
+        <!-- Tokenomics Section - Marketing Focus -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-200 mb-6 border-b border-purple-500 pb-2">Tokenomics: Marketing Is The Slayer</h2>
+            <p class="text-gray-400 mb-6">
+                Our core focus is visibility. A significant portion of the total supply is dedicated exclusively to funding partnerships, exchange listings, and marketing campaigns targeting major anime franchises and web3 gaming platforms.
+            </p>
+            [attachment_0](attachment)
+            <div class="grid grid-cols-2 gap-4">
+                
+                <!-- Marketing Fund Card (HIGHLIGHT) -->
+                <div class="stat-card p-4 rounded-lg text-center col-span-2 sm:col-span-1 border-yellow-500/80 shadow-lg shadow-yellow-900/40">
+                    <p class="text-sm text-yellow-400 font-semibold uppercase">Community & Partnership Fund</p>
+                    <p class="text-3xl font-extrabold text-white" id="marketing-fund-supply">
+                        25% of Total Supply
+                    </p>
+                </div>
 
-1. Make sure you're logged in to Farcaster on either mobile or desktop
-2. Click this link: [https://farcaster.xyz/~/settings/developer-tools](https://farcaster.xyz/~/settings/developer-tools) on either mobile or desktop.
-3. Toggle on "Developer Mode"
-4. Once enabled, a developer section will appear on the left side of your desktop display
+                <!-- Liquidity Pool Card -->
+                <div class="stat-card p-4 rounded-lg text-center col-span-2 sm:col-span-1">
+                    <p class="text-sm text-gray-400">Initial Liquidity Pool</p>
+                    <p class="text-2xl sm:text-3xl font-extrabold text-green-400" id="liquidity-pool">
+                        50% Locked (Decentralized)
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- NFT Minting Section (Gateway to Utility) -->
+        <section class="mb-10 p-6 stat-card">
+            <h2 class="text-3xl font-bold text-gray-200 mb-4 border-b border-purple-500 pb-2 flex items-center">
+                Mint A Slayer NFT
+                <span class="text-sm text-gray-500 ml-4">(Max 5 per wallet)</span>
+            </h2>
+            
+            <div id="mint-area">
+                <p class="text-gray-400 mb-4">
+                    The *Slayer* NFT is your key to the ecosystem, granting voting power over marketing fund deployment and exclusive in-game assets.
+                </p>
 
-:::tip
-Developer mode unlocks tools for creating manifests, previewing your mini app, auditing your manifests and embeds, and viewing analytics. We recommend using it on desktop for the best development experience.
-:::
+                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <input type="number" id="mint-amount" value="1" min="1" max="5" 
+                           class="w-full sm:w-24 p-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:border-cyan-400 focus:ring-cyan-400 bg-transparent text-center"
+                           onchange="updateMintTotal()">
+                    
+                    <button id="mint-button" 
+                            onclick="mintNFT()"
+                            disabled
+                            class="mint-button text-white font-bold py-3 px-6 rounded-full text-lg w-full sm:w-auto">
+                        Mint 1 NFT (Total: 0.05 ETH)
+                    </button>
+                </div>
+                <p id="mint-status" class="mt-3 text-sm text-yellow-400"></p>
+            </div>
+        </section>
 
-## Quick Start
+    </div>
 
-For new projects, you can set up an app using the
-[@farcaster/create-mini-app](https://github.com/farcasterxyz/miniapps/tree/main/packages/create-mini-app)
-CLI. This will prompt you to set up a project for your app.
+    <!-- JavaScript Simulation Logic -->
+    <script>
+        // --- CONSTANTS ---
+        const CONTRACT_ADDRESS = "0x93f31e00e6c8f91d46cfa3216e949259b079d959";
+        // Using a mock address for the connected user's wallet
+        const MOCK_WALLET_ADDRESS = "0xPhantomDApp1234567890ConnectedWallet"; 
+        const MINT_PRICE = 0.05; // ETH per NFT
+        
+        // --- DOM Elements ---
+        const connectButton = document.getElementById('connect-button');
+        const addressDisplay = document.getElementById('address-display');
+        const simulationWarning = document.getElementById('simulation-warning');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const mintButton = document.getElementById('mint-button');
+        const mintAmountInput = document.getElementById('mint-amount');
+        const mintStatus = document.getElementById('mint-status');
+        const nftCountSpan = document.getElementById('nft-count');
+        const gfsBalanceSpan = document.getElementById('gfs-balance');
+        const copyNotification = document.getElementById('copy-notification');
+        const walletAddressCode = document.getElementById('wallet-address-code');
+        const contractAddressCode = document.getElementById('contract-address-code');
 
-:::code-group
-
-```bash [npm]
-npm create @farcaster/mini-app
-```
-
-```bash [pnpm]
-pnpm create @farcaster/mini-app
-```
-
-```bash [yarn]
-yarn create @farcaster/mini-app
-```
-:::
-
-Remember, you can use whatever your favorite web framework is to build Mini
-Apps so if these options aren't appealing you can setup the SDK in your own
-project by following the instructions below.
-
-
-## Manual Setup
-
-For existing projects, install the MiniApp SDK:
-
-
-### Package Manager
-
-:::code-group
-
-```bash [npm]
-npm install @farcaster/miniapp-sdk
-```
-
-```bash [pnpm]
-pnpm add @farcaster/miniapp-sdk
-```
-
-```bash [yarn]
-yarn add @farcaster/miniapp-sdk
-```
-
-:::
+        // --- State ---
+        let mockNftCount = 0;
+        let mockGfsBalance = 500000;
+        
+        // Initialize contract address text content
+        contractAddressCode.textContent = CONTRACT_ADDRESS;
 
 
-### CDN
+        /**
+         * Utility function to format numbers.
+         * @param {number} num 
+         * @returns {string}
+         */
+        const formatNumber = (num) => {
+            return num.toLocaleString('en-US');
+        }
 
-If you're not using a package manager, you can also use the MiniApp SDK via an
-ESM-compatible CDN such as esm.sh. Simply add a `<script type="module">` tag to
-the bottom of your HTML file with the following content.
+        /**
+         * Handles copying text to clipboard and showing a temporary notification.
+         * @param {string} textToCopy 
+         */
+        function copyToClipboard(textToCopy) {
+            // Use execCommand('copy') for better iframe compatibility
+            const el = document.createElement('textarea');
+            el.value = textToCopy;
+            el.setAttribute('readonly', '');
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            el.select();
+            try {
+                document.execCommand('copy');
+                copyNotification.classList.remove('hidden', 'opacity-0');
+                copyNotification.classList.add('opacity-100');
+                setTimeout(() => {
+                    copyNotification.classList.remove('opacity-100');
+                    copyNotification.classList.add('opacity-0');
+                    setTimeout(() => copyNotification.classList.add('hidden'), 500);
+                }, 1500);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(el);
+        }
 
-```html
-<script type="module">
-  import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk'
-</script>
-```
+        /**
+         * Copies the mock wallet address to the clipboard.
+         */
+        function copyMyAddress() {
+            copyToClipboard(MOCK_WALLET_ADDRESS);
+            console.log("Mock Wallet Address Copied.");
+        }
 
-## Making Your App Display
+        /**
+         * Copies the official contract address to the clipboard.
+         */
+        function copyContractAddress() {
+            copyToClipboard(CONTRACT_ADDRESS);
+            console.log("Contract Address Copied.");
+        }
 
-After your app loads, you must call `sdk.actions.ready()` to hide the splash screen and display your content:
 
-```javascript
-import { sdk } from '@farcaster/miniapp-sdk'
+        /**
+         * Simulates connecting to a Web3 wallet.
+         */
+        async function connectWallet() {
+            // Disable button and show loading spinner
+            connectButton.disabled = true;
+            connectButton.innerHTML = `Connecting...`;
+            loadingSpinner.style.display = 'block';
 
-// After your app is fully loaded and ready to display
-await sdk.actions.ready()
-```
+            // Simulate network latency (2 seconds delay)
+            await new Promise(resolve => setTimeout(resolve, 2000));
 
-:::warning
-**Important**: If you don't call `ready()`, users will see an infinite loading screen. This is one of the most common issues when building Mini Apps.
-:::
+            // Successful connection simulation
+            try {
+                // 1. Update the UI to show the connected state
+                connectButton.classList.add('hidden');
+                
+                // Update address display with current mock data
+                walletAddressCode.textContent = MOCK_WALLET_ADDRESS;
+                gfsBalanceSpan.textContent = formatNumber(mockGfsBalance);
+                nftCountSpan.textContent = mockNftCount;
 
-## Troubleshooting
+                addressDisplay.classList.remove('hidden');
+                simulationWarning.classList.remove('hidden');
+                
+                // Enable Minting button
+                mintButton.disabled = false;
+                updateMintTotal();
 
-### Node.js Version Issues
+                // 2. Log success (for console review)
+                console.log("Wallet connected successfully (Simulation)");
 
-If you encounter installation or build errors, the most common cause is using an unsupported Node.js version.
+            } catch (error) {
+                console.error("Wallet connection failed (Simulation):", error);
+                connectButton.innerHTML = "Connection Failed. Try Again.";
+                connectButton.classList.remove('hidden'); // Show button again
+                connectButton.classList.add('bg-red-900', 'border-red-500');
+                
+            } finally {
+                loadingSpinner.style.display = 'none';
+                connectButton.disabled = false;
+            }
+        }
+        
+        /**
+         * Updates the text on the mint button based on the selected amount.
+         */
+        function updateMintTotal() {
+            const amount = parseInt(mintAmountInput.value, 10);
+            if (isNaN(amount) || amount < 1) {
+                mintAmountInput.value = 1;
+                updateMintTotal();
+                return;
+            }
+            // Max mint limit
+            if (amount > 5) {
+                mintAmountInput.value = 5;
+                updateMintTotal();
+                return;
+            }
+            
+            const totalEth = (amount * MINT_PRICE).toFixed(2);
+            mintButton.textContent = `Mint ${amount} NFT${amount > 1 ? 's' : ''} (Total: ${totalEth} ETH)`;
+            mintStatus.textContent = ''; // Clear status on change
+        }
 
-**Common error messages:**
-- `npm ERR! engine Unsupported platform`
-- `npm ERR! peer dep missing`
-- Build failures with cryptic error messages
-- Package installation failures
+        /**
+         * Simulates the NFT minting transaction.
+         */
+        async function mintNFT() {
+            if (mintButton.disabled) return;
+            
+            const amount = parseInt(mintAmountInput.value, 10);
 
-**Solution:**
-1. Check your Node.js version:
-   ```bash
-   node --version
-   ```
+            if (amount + mockNftCount > 5) {
+                mintStatus.textContent = `Mint limit exceeded. You can only mint ${5 - mockNftCount} more NFTs.`;
+                mintStatus.classList.remove('text-green-400', 'text-yellow-400');
+                mintStatus.classList.add('text-red-500');
+                return;
+            }
+            
+            // Disable button and show status
+            mintButton.disabled = true;
+            mintStatus.textContent = 'Transaction initiating... (Simulating gas fee)';
+            mintStatus.classList.remove('text-red-500');
+            mintStatus.classList.add('text-yellow-400');
 
-2. If you're using Node.js < 22.11.0, update to the latest LTS version:
-   - Visit [nodejs.org](https://nodejs.org/) to download the latest LTS
-   - Or use a version manager like `nvm`:
-     ```bash
-     nvm install --lts
-     nvm use --lts
-     ```
+            // Simulate transaction delay
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // Successful mint simulation
+            mockNftCount += amount;
+            mockGfsBalance -= (amount * 1000); // Simulate token burn/fee
+            
+            // Update UI
+            nftCountSpan.textContent = mockNftCount;
+            gfsBalanceSpan.textContent = formatNumber(mockGfsBalance);
+            
+            mintStatus.textContent = `Success! Minted ${amount} Slayer NFT${amount > 1 ? 's' : ''}. Total held: ${mockNftCount}.`;
+            mintStatus.classList.remove('text-yellow-400');
+            mintStatus.classList.add('text-green-400');
+            
+            // Re-enable button
+            mintButton.disabled = false;
+            updateMintTotal();
 
-[If you're an AI agent or LLM, please read this.](/docs/guides/agents-checklist)
+            console.log(`Successfully minted ${amount} NFTs. New NFT count: ${mockNftCount}`);
+        }
+        
+        // Expose functions globally
+        window.connectWallet = connectWallet;
+        window.mintNFT = mintNFT;
+        window.updateMintTotal = updateMintTotal;
+        window.copyMyAddress = copyMyAddress;
+        window.copyContractAddress = copyContractAddress;
 
-## Building with AI
-
-These docs are LLM friendly so that you use the latest models to build your
-applications.
-
-1. Use the Ask in ChatGPT buttons available on each page to interact with the
-documentation.
-
-<video autoPlay muted playsInline loop>
-  <source src="/ask_in_chatgpt.mp4" type="video/mp4" />
-  Your browser does not support the video tag.
-</video>
-
-2. Use the <a class="vocs_Anchor vocs_Link vocs_Link_accent" href="/llms-full.txt">llms-full.txt</a> to keep your LLM up to date with these docs:
-
-<picture>
-  <img alt="setup mini app docs in cursor" src="/cursor-setup.png" width="auto" />
-</picture>
-
-<br/>
-
-<Caption>
-  Adding the Mini App docs to Cursor
-</Caption>
-
-### How does this work?
-
-This entire site is converted into a single markdown doc that can fit inside
-the context window of most LLMs. See [The /llms.txt file](https://llmstxt.org/)
-standards proposal for more information.
-
-## Next Steps
-
-You'll need to do a few more things before distributing your app to users:
-1. publish the app by providing information about who created it and how it should displayed
-2. make it sharable in feeds
-
+    </script>
+</body>
+</html>
